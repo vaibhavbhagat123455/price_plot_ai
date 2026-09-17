@@ -10,8 +10,13 @@ import { SingleProductPredictionModal } from "@/components/SingleProductPredicti
 import { PredictAllModal } from "@/components/PredictAllModal";
 import { CompetitorAnalysis } from "@/components/CompetitorAnalysis";
 import { RevenueSimulator } from "@/components/RevenueSimulator";
-import { AdminLogin } from "@/components/AdminLogin";
+import { ClerkOnlyLogin } from "@/components/ClerkOnlyLogin";
 import { useUser } from "@/components/ClerkAuthWrapper";
+
+const ADMIN_EMAILS = [
+  "vaibhavbhagat123455@gmail.com",
+  "springboardmentor24680n@gmail.com"
+];
 
 export default function Home() {
   const clerk = useUser();
@@ -23,7 +28,6 @@ export default function Home() {
     isApproved: false,
     isAdmin: false
   });
-  const [adminSessionLoaded, setAdminSessionLoaded] = useState(false);
 
   const [activeTab, setActiveTab] = useState("overview");
   const [products, setProducts] = useState<Product[]>([]);
@@ -51,26 +55,14 @@ export default function Home() {
   ]);
 
   const [approvedEmails, setApprovedEmails] = useState<string[]>([
-    "vaibhavbhagat123455@gmail.com"
+    "vaibhavbhagat123455@gmail.com",
+    "springboardmentor24680n@gmail.com"
   ]);
-
-  useEffect(() => {
-    const savedSession = localStorage.getItem("pricepilot_admin_session");
-    if (savedSession) {
-      try {
-        const savedUser = JSON.parse(savedSession);
-        if (savedUser?.isAdmin) setCurrentUser(savedUser);
-      } catch {
-        localStorage.removeItem("pricepilot_admin_session");
-      }
-    }
-    setAdminSessionLoaded(true);
-  }, []);
 
   // Sync with live Clerk user when available
   useEffect(() => {
     if (clerkEmail) {
-      if (clerkEmail === "vaibhavbhagat123455@gmail.com") {
+      if (ADMIN_EMAILS.includes(clerkEmail.toLowerCase())) {
         setCurrentUser({
           email: clerkEmail,
           isApproved: true,
@@ -98,6 +90,9 @@ export default function Home() {
           ]);
         }
       }
+    } else {
+      setCurrentUser({ email: "", isApproved: false, isAdmin: false });
+      setActiveTab("overview");
     }
   }, [clerkEmail, approvedEmails]);
 
@@ -144,16 +139,8 @@ export default function Home() {
     setPendingUsers((prev) => prev.filter((u) => u.id !== id));
   };
 
-  const handleAdminLogout = () => {
-    localStorage.removeItem("pricepilot_admin_session");
-    setCurrentUser({ email: "", isApproved: false, isAdmin: false });
-    setActiveTab("overview");
-  };
-
-  if (!adminSessionLoaded && !clerkEmail) return null;
-
   if (!clerkEmail && !currentUser.isApproved) {
-    return <AdminLogin onLogin={(user) => setCurrentUser(user)} />;
+    return <ClerkOnlyLogin />;
   }
 
   return (
@@ -163,9 +150,7 @@ export default function Home() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         currentUser={currentUser}
-        setCurrentUser={setCurrentUser}
         pendingCount={pendingUsers.length}
-        onAdminLogout={handleAdminLogout}
       />
 
       {/* Main Content Body */}
@@ -173,13 +158,6 @@ export default function Home() {
         {!currentUser.isApproved ? (
           <PendingApprovalView
             currentUser={currentUser}
-            onSwitchToAdmin={() =>
-              setCurrentUser({
-                email: "vaibhavbhagat123455@gmail.com",
-                isApproved: true,
-                isAdmin: true
-              })
-            }
           />
         ) : (
           <>

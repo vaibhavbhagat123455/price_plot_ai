@@ -12,7 +12,6 @@ import {
   ShieldCheck, 
   UserCheck, 
   SlidersHorizontal, 
-  Sparkles,
   LogIn
 } from "lucide-react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "./ClerkAuthWrapper";
@@ -21,35 +20,15 @@ interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   currentUser: { email: string; isApproved: boolean; isAdmin: boolean };
-  setCurrentUser: (user: { email: string; isApproved: boolean; isAdmin: boolean }) => void;
   pendingCount: number;
-  onAdminLogout: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   currentUser,
-  setCurrentUser,
-  pendingCount,
-  onAdminLogout
+  pendingCount
 }) => {
-  const toggleDemoUser = () => {
-    if (currentUser.isAdmin) {
-      setCurrentUser({
-        email: "alex.mercer@retailcorp.io",
-        isApproved: false,
-        isAdmin: false
-      });
-    } else {
-      setCurrentUser({
-        email: "vaibhavbhagat123455@gmail.com",
-        isApproved: true,
-        isAdmin: true
-      });
-    }
-  };
-
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-subtle">
       {/* Top Banner with AI System Status & Admin Controls */}
@@ -114,23 +93,6 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          <button
-            onClick={toggleDemoUser}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 font-medium px-2.5 py-1 rounded-md transition-all text-xs flex items-center gap-1 shadow-sm"
-            title="Toggle between Superadmin vaibhavbhagat123455@gmail.com and a Pending Non-Admin Account for testing"
-          >
-            <Sparkles className="w-3 h-3 text-amber-300" />
-            {currentUser.isAdmin ? "Test Pending Non-Admin View" : "Switch to Admin (vaibhavbhagat123455@gmail.com)"}
-          </button>
-
-          {currentUser.isAdmin && (
-            <button
-              onClick={onAdminLogout}
-              className="bg-rose-950 hover:bg-rose-900 text-rose-200 border border-rose-800 font-medium px-2.5 py-1 rounded-md transition-all text-xs"
-            >
-              Admin Logout
-            </button>
-          )}
         </div>
       </div>
 

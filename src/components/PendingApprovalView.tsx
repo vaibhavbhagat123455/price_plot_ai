@@ -1,16 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Clock, ShieldAlert, CheckCircle2, Mail, ArrowRight, UserCheck, Sparkles } from "lucide-react";
+import { Clock, ShieldAlert, CheckCircle2, Mail, ArrowRight } from "lucide-react";
 
 interface PendingApprovalProps {
   currentUser: { email: string; isApproved: boolean; isAdmin: boolean };
-  onSwitchToAdmin: () => void;
 }
 
 export const PendingApprovalView: React.FC<PendingApprovalProps> = ({
-  currentUser,
-  onSwitchToAdmin
+  currentUser
 }) => {
   const [requested, setRequested] = useState(false);
 
@@ -78,22 +76,6 @@ export const PendingApprovalView: React.FC<PendingApprovalProps> = ({
               </div>
             )}
 
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="px-3 bg-white text-slate-400 font-medium">Developer & Demo Options</span>
-              </div>
-            </div>
-
-            <button
-              onClick={onSwitchToAdmin}
-              className="w-full bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-subtle"
-            >
-              <Sparkles className="w-4 h-4 text-brand-600" />
-              Switch Account to Super Admin (vaibhavbhagat123455@gmail.com)
-            </button>
           </div>
         </div>
       </div>

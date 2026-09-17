@@ -2,7 +2,6 @@ import os
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any, List
-from pydantic import BaseModel
 from catalog_datasets import load_products_from_csv, load_training_dataset_df
 from ml_engine import train_and_predict_models
 from agent_orchestrator import execute_multi_agent_pipeline
@@ -49,17 +48,9 @@ PENDING_USERS_DB = [
 ]
 
 APPROVED_USERS_DB = [
-    "vaibhavbhagat123455@gmail.com"
+    "vaibhavbhagat123455@gmail.com",
+    "springboardmentor24680n@gmail.com"
 ]
-
-# Demo admin credentials. Override these values in Render environment variables
-# before sharing the deployed application.
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "PricePilot@123")
-
-class AdminLoginRequest(BaseModel):
-    username: str
-    password: str
 
 @app.get("/")
 def root_check():
@@ -68,22 +59,6 @@ def root_check():
         "status": "online",
         "service": "PricePilot AI Backend",
         "health_check": "/api/health",
-    }
-
-@app.post("/api/auth/login")
-def admin_login(data: AdminLoginRequest):
-    """Validates the configured demo admin credentials."""
-    if data.username != ADMIN_USERNAME or data.password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=401, detail="Invalid admin username or password")
-
-    return {
-        "success": True,
-        "user": {
-            "username": ADMIN_USERNAME,
-            "email": os.getenv("ADMIN_EMAIL", "vaibhavbhagat123455@gmail.com"),
-            "isApproved": True,
-            "isAdmin": True,
-        },
     }
 
 @app.get("/api/health")

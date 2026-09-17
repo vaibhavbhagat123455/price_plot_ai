@@ -19,6 +19,11 @@ interface AdminUserManagementProps {
   onRejectUser: (id: string) => void;
 }
 
+const ADMIN_EMAILS = [
+  "vaibhavbhagat123455@gmail.com",
+  "springboardmentor24680n@gmail.com"
+];
+
 export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({
   pendingUsers,
   approvedEmails,
@@ -185,7 +190,7 @@ export const AdminUserManagement: React.FC<AdminUserManagementProps> = ({
                 <Mail className="w-3.5 h-3.5 text-brand-600 shrink-0" />
                 <span className="truncate">{email}</span>
               </div>
-              {email === "vaibhavbhagat123455@gmail.com" ? (
+              {ADMIN_EMAILS.includes(email.toLowerCase()) ? (
                 <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded shrink-0">
                   Super Admin
                 </span>
