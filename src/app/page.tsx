@@ -10,6 +10,7 @@ import { SingleProductPredictionModal } from "@/components/SingleProductPredicti
 import { PredictAllModal } from "@/components/PredictAllModal";
 import { CompetitorAnalysis } from "@/components/CompetitorAnalysis";
 import { RevenueSimulator } from "@/components/RevenueSimulator";
+import { AdminLogin } from "@/components/AdminLogin";
 import { useUser } from "@/components/ClerkAuthWrapper";
 
 export default function Home() {
@@ -18,10 +19,11 @@ export default function Home() {
 
   // Default User State - Superadmin vaibhavbhagat123455@gmail.com
   const [currentUser, setCurrentUser] = useState({
-    email: "vaibhavbhagat123455@gmail.com",
-    isApproved: true,
-    isAdmin: true
+    email: "",
+    isApproved: false,
+    isAdmin: false
   });
+  const [adminSessionLoaded, setAdminSessionLoaded] = useState(false);
 
   const [activeTab, setActiveTab] = useState("overview");
   const [products, setProducts] = useState<Product[]>([]);
@@ -51,6 +53,19 @@ export default function Home() {
   const [approvedEmails, setApprovedEmails] = useState<string[]>([
     "vaibhavbhagat123455@gmail.com"
   ]);
+
+  useEffect(() => {
+    const savedSession = localStorage.getItem("pricepilot_admin_session");
+    if (savedSession) {
+      try {
+        const savedUser = JSON.parse(savedSession);
+        if (savedUser?.isAdmin) setCurrentUser(savedUser);
+      } catch {
+        localStorage.removeItem("pricepilot_admin_session");
+      }
+    }
+    setAdminSessionLoaded(true);
+  }, []);
 
   // Sync with live Clerk user when available
   useEffect(() => {
@@ -88,13 +103,20 @@ export default function Home() {
 
   useEffect(() => {
     // Fetch product catalog from backend API or local dataset fallback
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
     fetch(`${apiUrl}/api/products`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.products) setProducts(data.products);
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data.products)) {
+          throw new Error(data.detail || "Product catalog API returned an invalid response");
+        }
+        return data;
       })
-      .catch(() => {
+      .then((data) => {
+        setProducts(data.products);
+      })
+      .catch((error) => {
+        console.error("Unable to load the backend catalog; using fallback catalog.", error);
         // Fallback catalog matching CSV
         setProducts([
           { id: "prod-1", name: "Wireless Noise-Canceling Headphones", category: "Audio & Electronics", sku: "AUD-WNC-001", current_price: 199.99, cost_price: 110.00, competitor_price: 189.99, competitor_name: "TechGiant Store", inventory: 420, historical_sales_30d: 1250, rating: 4.7, demand_trend: "Increasing", elasticity_score: 1.45, discount_percentage: 5, seasonality_factor: "High (Holiday & Back to School)", last_updated: "2026-08-18" },
@@ -122,6 +144,18 @@ export default function Home() {
     setPendingUsers((prev) => prev.filter((u) => u.id !== id));
   };
 
+  const handleAdminLogout = () => {
+    localStorage.removeItem("pricepilot_admin_session");
+    setCurrentUser({ email: "", isApproved: false, isAdmin: false });
+    setActiveTab("overview");
+  };
+
+  if (!adminSessionLoaded && !clerkEmail) return null;
+
+  if (!clerkEmail && !currentUser.isApproved) {
+    return <AdminLogin onLogin={(user) => setCurrentUser(user)} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Navigation Header */}
@@ -131,6 +165,7 @@ export default function Home() {
         currentUser={currentUser}
         setCurrentUser={setCurrentUser}
         pendingCount={pendingUsers.length}
+        onAdminLogout={handleAdminLogout}
       />
 
       {/* Main Content Body */}

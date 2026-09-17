@@ -564,6 +564,19 @@ NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
 
 Never commit or upload `.env`. It may contain private API keys. Use `.env.example` when sharing the project.
 
+### Default admin login
+
+The application now includes a demo admin username/password login backed by `POST /api/auth/login`.
+
+Default local credentials:
+
+```text
+Username: admin
+Password: PricePilot@123
+```
+
+Set `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `ADMIN_EMAIL` in Render before deploying. Change the default password before sharing the public deployment. This is a simple demo login; production use should replace it with Clerk-backed or database-backed authentication and server-side session/token authorization.
+
 ## Running the project
 
 ### Start the backend

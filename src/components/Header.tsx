@@ -23,6 +23,7 @@ interface HeaderProps {
   currentUser: { email: string; isApproved: boolean; isAdmin: boolean };
   setCurrentUser: (user: { email: string; isApproved: boolean; isAdmin: boolean }) => void;
   pendingCount: number;
+  onAdminLogout: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -30,7 +31,8 @@ export const Header: React.FC<HeaderProps> = ({
   setActiveTab,
   currentUser,
   setCurrentUser,
-  pendingCount
+  pendingCount,
+  onAdminLogout
 }) => {
   const toggleDemoUser = () => {
     if (currentUser.isAdmin) {
@@ -120,6 +122,15 @@ export const Header: React.FC<HeaderProps> = ({
             <Sparkles className="w-3 h-3 text-amber-300" />
             {currentUser.isAdmin ? "Test Pending Non-Admin View" : "Switch to Admin (vaibhavbhagat123455@gmail.com)"}
           </button>
+
+          {currentUser.isAdmin && (
+            <button
+              onClick={onAdminLogout}
+              className="bg-rose-950 hover:bg-rose-900 text-rose-200 border border-rose-800 font-medium px-2.5 py-1 rounded-md transition-all text-xs"
+            >
+              Admin Logout
+            </button>
+          )}
         </div>
       </div>
 
