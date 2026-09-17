@@ -61,6 +61,15 @@ class AdminLoginRequest(BaseModel):
     username: str
     password: str
 
+@app.get("/")
+def root_check():
+    """Simple landing response for the Render service base URL."""
+    return {
+        "status": "online",
+        "service": "PricePilot AI Backend",
+        "health_check": "/api/health",
+    }
+
 @app.post("/api/auth/login")
 def admin_login(data: AdminLoginRequest):
     """Validates the configured demo admin credentials."""
