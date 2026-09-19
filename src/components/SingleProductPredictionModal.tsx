@@ -64,7 +64,13 @@ export const SingleProductPredictionModal: React.FC<SingleProductPredictionModal
     // Fetch ML & Multi-Agent prediction from backend API
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
     fetch(`${apiUrl}/api/predict/single/${product.id}`)
-      .then((res) => res.json())
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || "Prediction API returned an error");
+        }
+        return data;
+      })
       .then((data) => {
         if (data.success) {
           setPredictionData(data);
@@ -73,7 +79,8 @@ export const SingleProductPredictionModal: React.FC<SingleProductPredictionModal
         }
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("Unable to load backend prediction; using local fallback.", error);
         fallbackLocalPrediction(product);
         setLoading(false);
       });

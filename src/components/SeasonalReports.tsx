@@ -10,7 +10,11 @@ export const SeasonalReports: React.FC = () => {
   useEffect(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
     fetch(`${apiUrl}/api/seasonal-reports`)
-      .then((res) => res.json())
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Seasonal API returned an error");
+        return data;
+      })
       .then((data) => setReport(data))
       .catch(() => {
         setReport({

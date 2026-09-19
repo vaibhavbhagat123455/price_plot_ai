@@ -9,9 +9,16 @@ export const CompetitorAnalysis: React.FC = () => {
   useEffect(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
     fetch(`${apiUrl}/api/competitor-analysis`)
-      .then((res) => res.json())
+      .then(async (res) => {
+        const responseData = await res.json();
+        if (!res.ok || !Array.isArray(responseData.competitor_matrix)) {
+          throw new Error(responseData.detail || "Competitor API returned an invalid response");
+        }
+        return responseData;
+      })
       .then((resData) => setData(resData.competitor_matrix || []))
-      .catch(() => {
+      .catch((error) => {
+        console.error("Unable to load competitor analysis; using fallback data.", error);
         setData([
           { product_id: "prod-1", product_name: "Wireless Noise-Canceling Headphones", category: "Electronics", our_price: 199.99, competitor_name: "TechGiant Store", competitor_price: 189.99, price_difference: -10.0, difference_pct: -5.0, market_position: "Premium (Risk of losing price-sensitive shoppers)" },
           { product_id: "prod-2", product_name: "Smart Fitness Watch Ultra", category: "Wearables", our_price: 249.5, competitor_name: "FitLife Direct", competitor_price: 259.99, price_difference: 10.49, difference_pct: 4.2, market_position: "Underpriced (Opportunity to raise price)" },
